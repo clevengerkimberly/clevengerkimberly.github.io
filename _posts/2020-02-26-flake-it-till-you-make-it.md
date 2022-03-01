@@ -1,17 +1,118 @@
 ---
 layout: post
-title: Flake it till you make it
-subtitle: Excerpt from Soulshaping by Jeff Brown
-cover-img: /assets/img/path.jpg
-thumbnail-img: /assets/img/thumb.png
-share-img: /assets/img/path.jpg
-tags: [books, test]
+title: ICAMPAM Abstract
+subtitle: Issues with Idle Sleep Mode and Calculating MAD and Open-Source Counts in R
+tags: [R, raw acceleration]
 ---
 
-Under what circumstances should we step off a path? When is it essential that we finish what we start? If I bought a bag of peanuts and had an allergic reaction, no one would fault me if I threw it out. If I ended a relationship with a woman who hit me, no one would say that I had a commitment problem. But if I walk away from a seemingly secure route because my soul has other ideas, I am a flake?
+# ICAMPAM Abstracts
 
-The truth is that no one else can definitively know the path we are here to walk. It’s tempting to listen—many of us long for the omnipotent other—but unless they are genuine psychic intuitives, they can’t know. All others can know is their own truth, and if they’ve actually done the work to excavate it, they will have the good sense to know that they cannot genuinely know anyone else’s. Only soul knows the path it is here to walk. Since you are the only one living in your temple, only you can know its scriptures and interpretive structure.
+In this first post, I'll be talking about a last-minute abstract submission to ICAMPAM and all the drama that ensued.
 
-At the heart of the struggle are two very different ideas of success—survival-driven and soul-driven. For survivalists, success is security, pragmatism, power over others. Success is the absence of material suffering, the nourishing of the soul be damned. It is an odd and ironic thing that most of the material power in our world often resides in the hands of younger souls. Still working in the egoic and material realms, they love the sensations of power and focus most of their energy on accumulation. Older souls tend not to be as materially driven. They have already played the worldly game in previous lives and they search for more subtle shades of meaning in this one—authentication rather than accumulation. They are often ignored by the culture at large, although they really are the truest warriors.
+---
 
-A soulful notion of success rests on the actualization of our innate image. Success is simply the completion of a soul step, however unsightly it may be. We have finished what we started when the lesson is learned. What a fear-based culture calls a wonderful opportunity may be fruitless and misguided for the soul. Staying in a passionless relationship may satisfy our need for comfort, but it may stifle the soul. Becoming a famous lawyer is only worthwhile if the soul demands it. It is an essential failure if you are called to be a monastic this time around. If you need to explore and abandon ten careers in order to stretch your soul toward its innate image, then so be it. Flake it till you make it.
+## Our Purpose
+We planned on keeping it simple- just a comparison of four ways of classifying activity intensity using secondary analysis of data from 154 adults. The four methods relied on vector magnitude (VM) counts, Euclidean Norm Minus One (ENMO), Mean Amplitude Deviation (MAD), and open-source VM counts. But a few problems arose that others might have as well.
+
+## Reading in Raw ActiGraph Files to R
+As with all good coding projects, step one was to go find code from a prior project that we could edit as needed. However, I've typically used the 'read_AG_raw' function from the AGread package to read in raw ActiGraph files that have been exported from ActiLife as a csv file.
+
+```r
+  rawdata<-AGread::read_AG_raw("File1RAW.csv", skip=10, return_raw=TRUE)
+```
+
+More recently, I've shifted to directly reading in the gt3x files to save storage space and an extra, unnecessary step in ActiLife. This is where the problems began.
+
+```r
+   rawdata<- read.gt3x::read.gt3x("File.gt3x)
+```
+
+
+## Calculating Metrics
+Most frequently, I use the AGread package to calculate ENMO and the acc package to calculate MAD.
+```r
+  maddata<-acc::readRaw("File1.csv", type='mad')
+  enmodata<-AGread::read_AG_raw("File1RAW.csv", skip=10, output_window_secs =5,calibrate=TRUE)
+```
+
+However, these two functions are designed to read in the data and then calculate the metrics, so they didn't work out-of-the-box to calculate metrics using data that had already been read in to the R environment. After considering using GGIR, I decided to give the SummarizedActigraphy package a go, which has a function to calculate a number of metrics (e.g., ENMO, MAD, MIMS). This is when we noticed something was awry in our data. 
+
+```r
+  rawdata<-as.data.frame(read.gt3x::read.gt3x("File1.gt3x"))
+  names(rawdata)<-(c("HEADER_TIME_STAMP","X","Y","Z"))
+  metrics<- SummarizedActigraphy::calculate_measures(
+    df = rawdata,dynamic_range = c(-8, 8),fix_zeros = FALSE,calculate_mims = FALSE, 
+    calculate_ac = TRUE,flag_data = FALSE,verbose = FALSE)
+```
+
+## The  Problems..
+There were gaps! Sections of data where the metrics could not be calculated. Turns out, the ever-bothersome idle sleep mode was on (this seems to be a common issue in secondary data analysis..). 
+
+### Idle Sleep Mode
+Idle sleep mode is the default setting when initializing ActiGraph monitors in ActiLife. It causes the device to enter a low power ('sleep') state after experiencing 10 seconds where acceleration varies less than 40 mg. The device then checks once per second to see if anything has changed. Now, what happens to these idle sleep times depends on how the gt3x data are treated. Here are a few options:
+
+The first is what the data look like if you just read the gt3x in directly. When idle sleep mode is active, there are no data- these rows simply do not exist.
+```r
+  rawdata<-as.data.frame(read.gt3x::read.gt3x("File1.gt3x"))
+ ```
+
+The second options is what happens when you read the gt3x in to ActiLife and then export the raw data as a csv. There is now a row for every single sample (e.g., 30 samples per second from the moment the device was initialized to when the data were downloaded). For the times that idle sleep mode was activated, the last recorded acceleration values are carried forward until the device 'wakes up.' 
+```r
+  rawdatacsv<-AGread::read_AG_raw("File1RAW.csv", skip=10, return_raw = TRUE)
+```
+
+Lastly, we can use the argument 'imputeZeroes' in the read.gt3x function to simply fill in idle sleep times with 0 acceleration in each axis.
+```r
+  rawdatazero<-as.data.frame(read.gt3x::read.gt3x("File1.gt3x",imputeZeroes = TRUE))
+```
+
+### The Metrics
+After solving the idle sleep mode issue, we carried on with calculating each metric individually (in lieu of using the SummarizedActigraphy function) because I'd now lost my faith in humanity and myself. VM counts came directly from ActiLife and ENMO is easy to calculate, so no issues with those two. But MAD and open-source activity counts were a bit more problematic.
+
+#### MAD
+Right away we noticed that MAD was not the same depending on which method we used to calculate it (the SummarizedActiGraphy versus acc packages).
+
+To better understand what is happening 'behind the scenes,' I usually 1) go look at the documentation on GitHub where you can often find vignettes or the function's code or 2) enter the name of the function in R console and press enter (no parentheses). For example, if I run the below code, I see the actual code for the 'calculate_measures' function. In this case, the function actually calls a helper and when I look at that function, I can see how MAD is being calculated by the SummarizedActigraphy package.
+
+```r
+  SummarizedActigraphy::calculate_measures
+  SummarizedActigraphy::calculate_mad
+```
+
+Using this information, we can see that the SummarizedActigraphy package resulted in the same estimates as the following:
+```r
+rawdata<-as.data.frame(read.gt3x::read.gt3x("File1.gt3x"))
+rawdata$VMraw<-(sqrt(rawdata$X^2 + rawdata$Y^2 + rawdata$Z^2))
+rawdata$Timestamp60<-lubridate::floor_date(rawdata$time,"1 min")
+rawdata2<-rawdata %>% group_by(Timestamp60) %>%
+  summarise(MAD = mean(abs(VMraw - mean(VMraw, na.rm = TRUE)))) 
+```
+
+But this didn't match with the estimates from the acc package. By looking at the acc package's function, the chief difference is that the acc package calculates MAD over a 6-s window while the SummarizedActiGraphy function uses a 1-min window by default. Previously, we have averaged our 6-s MAD values generated from the acc package over a 1-min epoch if we wanted to use a longer epoch length.  
+```r
+  rawdata<-acc::readRaw("File1RAW.csv", type='mad')
+  setDT(rawdata)
+  rawdata$Timestamp60<-lubridate::floor_date(rawdata$Time,"1 min")
+  data1min<-rawdata[,lapply(.SD,mean),by=c("Timestamp60"),.SDcols=c("MAD")]
+```
+
+So, to replicate this, we could do something like below. Using the acc approach instead of the SummarizedActiGraphy approach changed our estimates of PA based on MAD cut-points pretty substantially, so should be kept in mind (I don't mean one is right or wrong, just different).
+```r
+  rawdata<-as.data.frame(read.gt3x::read.gt3x("File1.gt3x"))
+  rawdata$VMraw<-(sqrt(rawdata$X^2 + rawdata$Y^2 + rawdata$Z^2))
+  rawdata$Timestamp6<-lubridate::floor_date(rawdata$time,"6 sec")
+  maddata<-rawdata %>% group_by(Timestamp6) %>%
+    summarise(MAD = mean(abs(VMraw - mean(VMraw, na.rm = TRUE)))) 
+  maddata$Timestamp60<-lubridate::floor_date(maddata$Timestamp6,"1 min")
+  setDT(maddata)
+  data1min<-maddata[,lapply(.SD,mean),by=c("Timestamp60"),.SDcols=c("MAD")]
+```
+
+Yay! Now we've replicated the way MAD is calculated in the acc package.
+
+#### Open-Source Activity Counts
+The only issue here is that the activityCounts package's counts function assumes that you have continuous data from the start time to the download time. Instead of using the timestamps in the raw acceleration file, it generates them based on the sampling rate and data start time. So, if you have the aforementioned idle sleep mode problem and haven't accounted for that missing data, the times generated by this function will be incorrect.
+
+
+# The End 
+These are just some of the hurdles that came up while analyzing the data for this abstract. However, another difficulty is deciding how to classify activity intensity, particularly when you have a sample with ages ranging from 18 to 90. More on that later..
