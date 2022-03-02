@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Repository - Steenbock
-subtitle: Applying the Steenbock neural network to raw acceleration data
+subtitle: Applying the Steenbock Neural Network to Raw Acceleration Data
 tags: [accelerometry, R, raw acceleration, repository]
 ---
 In this series of posts, I’ll show how to use models available in our repository of methods for analyzing accelerometer data.
