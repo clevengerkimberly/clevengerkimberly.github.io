@@ -66,14 +66,13 @@ data30sec<-cbind(data30sec,pred)
 ## Putting it All Together
 But, let’s be realistic. You don’t normally only have one file from one participant. Here’s an example of how I might apply the Steenbock algorithm to multiple participants. In addition to the ‘feature_extraction’ function defined above, I’m going to make a ‘steenbock’ function which will read in a gt3x file, calculate the features, and use the model to predict METs. You can probably imagine how this could be tweaked slightly to work for other types of raw acceleration data (e.g., ActiGraph raw csv, GENEActiv, etc.).
 ```r
-
 steenbock<-function(x){
   rawdata<-as.data.frame(read.gt3x::read.gt3x(x))
-  rawdata$id
+  rawdata$id<-x
   rawdata$Timestamp<-lubridate::floor_date(rawdata$time,"30 sec")
   setDT(rawdata)
   
-  data30sec<-rawdata[, as.list(unlist(lapply(.SD, feature_extraction))), by="Timestamp", .SDcols=c("X","Y","Z")]
+  data30sec<-rawdata[, as.list(unlist(lapply(.SD, feature_extraction))), by=c("Timestamp","id"), .SDcols=c("X","Y","Z")]
   
   data30sec<-as.data.frame(data30sec)
   pred <-as.vector(predict(nn_actigraph_right_model, newdata = data30sec)$data$response)
