@@ -24,7 +24,7 @@ tryCatch(library(lme4),error=function(e){install.packages("lme4");library(lme4)}
 tryCatch(library(ranger),error=function(e){install.packages("ranger");library(ranger)}) 
 ```
 
-Steenbock et al. (2019) actually provided like…72 models in this paper, but let’s just focus on one for now- the ActiGraph right hip neural network. We first load the model and see which features it wants.
+Steenbock et al. (2019) actually provided like…72 models in this paper, but let’s just focus on one for now- the ActiGraph right hip neural network. We first load the model and see which features it wants. This model object (filename 'nn_actigraph_right_METs_30s.Rds') was provided by Steenbock et al., (2019); further description is in their original paper and on the repository site.
 ```r
 nn_actigraph_right_model<-readRDS("nn_actigraph_right_METs_30s.Rds")
 nn_actigraph_right_model$features
@@ -37,7 +37,7 @@ On the repository website, you can see the example data sheet provided by Steenb
 Instead, let’s read in a gt3x raw acceleration file and calculate these features ourselves in 30-s non-overlapping windows.
 To do this, we are going to define a function called 'feature_extraction' and then apply it to our data.
 ```r
-rawdata<-as.data.frame(read.gt3x::read.gt3x("PID_168_1_Accel.gt3x"))
+rawdata<-as.data.frame(read.gt3x::read.gt3x("File1.gt3x"))
 rawdata$Timestamp<-lubridate::floor_date(rawdata$time,"30 sec")
 setDT(rawdata)
 
@@ -57,7 +57,7 @@ data30sec<-rawdata[, as.list(unlist(lapply(.SD, feature_extraction))), by="Times
 
 
 ## Predicting METs
-Now that we have our 30-s feature data, we can use the nn_actigraph_right_model model object provided by Steenbock et al. (2019) to predict METs for each epoch, which we will bind back to the 30-s data.
+Now that we have our 30-s feature data, we can use the 'nn_actigraph_right_model' model object provided by Steenbock et al. (2019) to predict METs for each epoch, which we will bind back to the 30-s data.
 ```r
 data30sec<-as.data.frame(data30sec)
 pred <-as.vector(predict(nn_actigraph_right_model, newdata = data30sec)$data$response)
@@ -65,7 +65,7 @@ data30sec<-cbind(data30sec,pred)
 ```
 
 ## Putting it All Together
-But, let’s be realistic. You don’t normally only have one file from one participant. Here’s an example of how I might apply the Steenbock algorithm to multiple participants. In addition to the ‘feature_extraction’ function defined above, I’m going to make a ‘steenbock’ function which will read in a gt3x file, calculate the features, and use the model to predict METs.
+But, let’s be realistic. You don’t normally only have one file from one participant. Here’s an example of how I might apply the Steenbock algorithm to multiple participants. In addition to the ‘feature_extraction’ function defined above, I’m going to make a ‘steenbock’ function which will read in a gt3x file, calculate the features, and use the model to predict METs. You can probably imagine how this could be tweaked slightly to work for other types of raw acceleration data (e.g., ActiGraph raw csv, GENEActiv, etc.).
 ```r
 
 steenbock<-function(x){
