@@ -4,14 +4,13 @@ title: Repository - Steenbock
 subtitle: Applying the Steenbock neural network to raw acceleration data
 tags: [accelerometry, R, raw acceleration, repository]
 ---
-
 In this series of posts, I’ll show how to use models available in our repository of methods for analyzing accelerometer data.
 ---
 
 ## Our Purpose
 If you haven’t already, check out our [repository](https://sites.google.com/view/accelerometerrepository/) which hosts 57 methods (soon to be more!) for analyzing accelerometer data using raw acceleration or novel analytic techniques like machine learning. The purpose of the repository is to make models easier for researchers to find and implement, ideally so these models can be further cross-validated or developed. 
 Each model in the repository has information like how it was developed, instructions for use, and, when possible, example data and R code.
-Today I’ll illustrate how to use four models published by [Steenbock et al.’s (2019)](https://sites.google.com/view/accelerometerrepository/available-models/provided-as-r-code/steenbock). 
+Today I’ll illustrate how to use one of the models published by [Steenbock et al. (2019)](https://sites.google.com/view/accelerometerrepository/available-models/provided-as-r-code/steenbock). 
 Steenbock et al. (2019) did a great job of providing example data for their models. However, today I want to start from raw acceleration data, calculate features, and then implement the model.
 
 
