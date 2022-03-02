@@ -10,4 +10,4 @@ Before NCI, I completed my:
 - PhD in Kinesiology at Michigan State University
 - MS and BS in Exercise Physiology at Ohio University
 
-[Download my CV.](/docs/ClevengerCV312022.pdf)
+[Download my CV.](/blob/master/docs/ClevengerCV312022.pdf)
