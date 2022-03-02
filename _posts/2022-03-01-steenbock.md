@@ -85,7 +85,7 @@ steenbock<-function(x){
 I can then apply this function to a whole list of files in my working directory.
 ```r
 filenames<-list.files(pattern="*.gt3x")
-data<-try(lapply(filenames,steenbox) %>% bind_rows())
+data<-try(lapply(filenames,steenbock) %>% bind_rows())
 ```
 
 
