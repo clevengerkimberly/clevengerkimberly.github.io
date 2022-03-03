@@ -12,9 +12,13 @@ I try (and fail) to implement ActiGraph’s activity count algorithm in Python.
 Yesterday, ActiGraph released their previously-proprietary algorithm for calculating activity counts. This opens a world of possibility for physical activity researchers. But first, I just wanted to test out the algorithm.
 
 ## Implementing the Algorithm
-ActiGraph released a pre-print describing the algorithm(s) and Python code to implement the count algorithm on raw acceleration data. I implemented the provided python code in a [Jupyter notebook](https://jupyter.org/try) and in [Anaconda](https://www.anaconda.com/products/individual). I tested this with a few files- free-living, lab-based, using idle sleep mode versus no idle sleep mode, etc.  
+ActiGraph released a [pre-print](https://www.researchsquare.com/article/rs-1370418/v1) describing the algorithm(s) and [Python code](https://github.com/actigraph/agcounts/) to implement the count algorithm on raw acceleration data. I implemented the provided python code in a [Jupyter notebook](https://jupyter.org/try) and in [Anaconda](https://www.anaconda.com/products/individual). I tested this with a few files- free-living, lab-based, using idle sleep mode versus no idle sleep mode, etc.  
 
-Below I’m specifically showing two files that were including in the [GitHub repository](https://github.com/actigraph/agcounts/data.zip). In the ‘data.zip’ file at the main agcounts branch, there was a file in the ‘raw’ folder called ‘raw_30_30.csv’ and a file in the ‘ActiLifeCounts’ folder called ‘raw_30_30_counts30sec.csv.’ I surmised (but could be totally wrong) that these two files were related. I assumed that if I used the count algorithm on the ‘raw_30_30.csv,’ I would get the same count values as found in the ‘raw_30_30_counts30sec.csv.’ The counts didn’t match, but I’m sure someone will either point out what I’ve done wrong, or re-implement the code based on the provided pseudo-code (hopefully in R!). For now, I’ll just show what I did and hopefully somehow will have an answer. 
+Below I’m specifically showing two files that were including in the [GitHub repository](https://github.com/actigraph/agcounts/data.zip) ‘data.zip’ file:
+-'raw_30_30.csv’ in the ‘raw’ folder
+- ‘raw_30_30_counts30sec.csv’ in the ‘ActiLifeCounts’ folder
+
+I surmised (but could be totally wrong) that these two files were related. I assumed that if I used the count algorithm on the ‘raw_30_30.csv,’ I would get the same count values as found in the ‘raw_30_30_counts30sec.csv.’ The counts didn’t match, but I’m sure someone will either point out what I’ve done wrong, or re-implement the code based on the provided pseudo-code (hopefully in R!). For now, I’ll just show what I did and hopefully find an answer soon. 
 
 Jupyter notebooks are super easy to use (I recomend that if you've never used Python) but below is what I did in Anaconda (a way of downloading/managing Python with a bunch of popular packages instead of doing it piece-meal). 
 
