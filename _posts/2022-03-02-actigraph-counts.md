@@ -20,7 +20,7 @@ Below I’m specifically showing two files that were including in the [GitHub re
 
 I surmised (but could be totally wrong) that these two files were related. I assumed that if I used the count algorithm on the ‘raw_30_30.csv,’ I would get the same count values as found in the ‘raw_30_30_counts30sec.csv.’ The counts didn’t match, but I’m sure someone will either point out what I’ve done wrong, or re-implement the code based on the provided pseudo-code (hopefully in R!). For now, I’ll just show what I did and hopefully find an answer soon. 
 
-Jupyter notebooks are super easy to use (I recomend that if you've never used Python) but below is what I did in Anaconda (a way of downloading/managing Python with a bunch of popular packages instead of doing it piece-meal). 
+Jupyter notebooks are super easy to use (I recommend that if you've never used Python) but below is what I did in Anaconda (a way of downloading/managing Python with a bunch of popular packages instead of doing it piece-meal). 
 
 Open Anaconda from the Windows search bar and create an environment in which to work. 
 
