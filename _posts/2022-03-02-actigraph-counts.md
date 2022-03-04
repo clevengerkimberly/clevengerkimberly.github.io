@@ -99,6 +99,7 @@ This writes a csv with count values- yay!
 
 Unfortunately, these count values do not match. The left three columns are from the ‘raw_30_30_counts30sec.csv’ file while the right three columns are from Python. Of note, they are in a different order (y, x, z vs. x, y, z). 
 
+```r 
   Axis1. Axis2. Axis3. Col1. Col2. Col3.
 1   3674   4184   4568  4212  3645  4759
 2   4200   3773   3737  3766  4207  3734
@@ -107,7 +108,7 @@ Unfortunately, these count values do not match. The left three columns are from 
 5   3742   4118   4345  4123  3749  4330
 6   3979   4015   3846  4023  3987  3844
   
-
+```
   
 
 When I have more time, I’ll keep looking in to this…otherwise I look forward to seeing how this develops. 
