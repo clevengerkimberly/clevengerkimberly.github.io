@@ -11,4 +11,4 @@ Before USU, I completed a:
 - PhD in Kinesiology at Michigan State University
 - MS and BS in Exercise Physiology at Ohio University
 
-[Download my CV.](/assets/ClevengerCV10222022.pdf)
+[Download my CV.](/assets/ClevengerCV1192023.pdf)
